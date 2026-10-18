@@ -16,14 +16,14 @@ export class StatusBarPresentation {
     private observer: MutationObserver | null = null;
     private frame: number | null = null;
     private items = new Set<HTMLElement>();
-    private get win(): Window & typeof globalThis { return this.doc.defaultView as Window & typeof globalThis; }
+    private get win(): Window & typeof window { return this.doc.defaultView as Window & typeof window; }
     constructor(private doc: Document) {}
 
     start(): void {
         if (this.observer) return;
         this.observer = new this.win.MutationObserver(records => {
-            if (records.some(r => (r.target instanceof this.win.Element ? r.target : r.target.parentElement)?.closest('.status-bar') ||
-                Array.from(r.addedNodes).some(n => n instanceof this.win.Element &&
+            if (records.some(r => (r.target.instanceOf(this.win.Element) ? r.target : r.target.parentElement)?.closest('.status-bar') ||
+                Array.from(r.addedNodes).some(n => n.instanceOf(this.win.Element) &&
                     (n.matches('.status-bar, .syncstatusbar') || n.querySelector('.status-bar, .syncstatusbar'))))) this.schedule();
         });
         this.refresh();
@@ -67,7 +67,7 @@ export class StatusBarPresentation {
             const fragment = this.doc.createDocumentFragment();
             let offset = 0;
             for (const match of text.matchAll(tokenPattern)) {
-                const index = match.index!, raw = match[0];
+                const index = match.index ?? 0, raw = match[0];
                 const icon = getIcon(symbols[raw.replace(/\uFE0F/g, '')]);
                 if (!icon) continue; // No unsupported icon on older Obsidian.
                 fragment.append(this.doc.createTextNode(text.slice(offset, index)));

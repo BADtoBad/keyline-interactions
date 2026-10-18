@@ -32,6 +32,7 @@ Use Node.js 22 and pnpm 10.11.0:
 ```sh
 pnpm install --frozen-lockfile
 pnpm typecheck
+pnpm lint
 pnpm pretest
 pnpm test
 pnpm build
@@ -41,6 +42,10 @@ The production build writes `main.js` locally. Development only copies into a Va
 
 ## Release status
 
-First public bilingual preview: **0.7.3**. Automated model tests and a real macOS Obsidian 1.13.7 interface check are included in the release preparation; old-Mac hardware and all plugin combinations are not certified. Please report reproducible issues without private note content.
+Public preview: **0.7.4**. Community submission is on hold pending publicly documented upstream permission. Automated tests and macOS checks are recorded in [release verification](RELEASE-VERIFICATION.md); old-Mac hardware and all plugin combinations are not certified. Please report reproducible issues without private note content.
+
+## Provenance
+
+Keyline interactions derives from the local Notion Markdown Guard fork of [Feel the Notion](https://github.com/MichaelNguyen5653/feel-the-notion) 0.6.0 (snapshot `92eea6ba535376e1e56527e5a28c3a11cc994c4d`), whose upstream is [BCS1037/notion-block](https://github.com/BCS1037/notion-block) 1.4.0. Original MIT copyright notices are retained. A distinct product name does not erase that lineage or imply upstream endorsement.
 
 MIT. Retained copyright and third-party notices are in [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

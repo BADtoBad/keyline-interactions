@@ -170,7 +170,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
         this.panels.clear(); this.navButtons.clear(); this.query = '';
         this.insertListEl = this.themeLayoutPanelEl = null;
         const header = containerEl.createDiv({ cls: 'ncl-settings-header' });
-        header.createEl('h2', { text: 'Keyline' });
+        this.heading(header, 'Keyline', 'ncl-settings-brand', 2);
         header.createSpan({ cls: 'ncl-settings-version', text: this.plugin.manifest.version });
         const search = header.createEl('input', { cls: 'ncl-settings-search', attr: { type: 'search', placeholder: localize('搜索设置'), 'aria-label': localize('搜索 Keyline 设置') } });
         const shell = containerEl.createDiv({ cls: 'ncl-settings-shell' });
@@ -215,7 +215,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
             event.preventDefault(); event.stopPropagation(); search.value = '';
             search.dispatchEvent(new Event('input'));
         });
-        const win = containerEl.ownerDocument.defaultView as Window & typeof globalThis;
+        const win = containerEl.ownerDocument.defaultView as Window & typeof window;
         const updateWidth = () => {
             const narrow = containerEl.getBoundingClientRect().width < 640;
             if (containerEl.classList.contains('is-narrow') !== narrow) containerEl.classList.toggle('is-narrow', narrow);
@@ -223,6 +223,13 @@ export class BlockPluginSettingTab extends PluginSettingTab {
         this.resize = new win.ResizeObserver(updateWidth); this.resize.observe(containerEl); updateWidth();
         this.showSection(this.section);
         this.plugin.refreshInterfacePresentation(containerEl.ownerDocument);
+    }
+
+    private heading(container: HTMLElement, name: string, cls: string, level: number): void {
+        const heading = new Setting(container).setName(name).setHeading();
+        heading.settingEl.addClass(cls);
+        heading.nameEl.setAttribute('role', 'heading');
+        heading.nameEl.setAttribute('aria-level', String(level));
     }
 
     hide(): void {
@@ -242,7 +249,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
         if (!panel) {
             panel = this.contentEl.createEl('section', { cls: 'ncl-settings-panel', attr: { 'aria-label': item.label } });
             panel.dataset.section = id;
-            panel.createEl('h3', { cls: 'ncl-settings-title', text: item.label });
+            this.heading(panel, item.label, 'ncl-settings-title', 3);
             panel.createEl('p', { cls: 'ncl-settings-description', text: item.description });
             this.panels.set(id, panel);
             switch (id) {
@@ -279,6 +286,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
         let items: HTMLElement | null = null;
         for (const child of Array.from(container.children)) {
             const el = child as HTMLElement;
+            if (el.matches('.ncl-settings-title')) continue;
             if (el.matches('.setting-item-heading, .ncl-theme-layout-section') && !el.querySelector('button')) {
                 const group = container.ownerDocument.createElement('section');
                 group.className = 'ncl-preference-group';
@@ -646,7 +654,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
         readingParagraphEl.createEl('br');
         readingParagraphEl.appendText(localize('阅读视图第二行。'));
 
-        panelEl.createEl('h3', { cls: 'ncl-theme-layout-section', text: localize('页面') });
+        this.heading(panelEl, localize('页面'), 'ncl-theme-layout-section', 4);
         this.addThemeLayoutSlider(
             panelEl,
             'textMaxWidth',
@@ -659,7 +667,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
             localize('左右留白'),
             localize('最左端为自动留白；手动值在窄窗口中不超过每侧 20%。')
         );
-        panelEl.createEl('h3', { cls: 'ncl-theme-layout-section', text: localize('正文') });
+        this.heading(panelEl, localize('正文'), 'ncl-theme-layout-section', 4);
         this.addThemeLayoutSlider(
             panelEl,
             'editorLineHeight',
@@ -696,7 +704,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
             localize('首行缩进'),
             localize('仅用于普通正文段落，不缩进标题、列表、引用或代码块。')
         );
-        panelEl.createEl('h3', { cls: 'ncl-theme-layout-section', text: localize('列表') });
+        this.heading(panelEl, localize('列表'), 'ncl-theme-layout-section', 4);
         this.addThemeLayoutSlider(
             panelEl,
             'listLineHeight',
@@ -727,7 +735,7 @@ export class BlockPluginSettingTab extends PluginSettingTab {
             localize('无序列表圆点大小'),
             localize('控制无序列表实心圆点的直径。')
         );
-        panelEl.createEl('h3', { cls: 'ncl-theme-layout-section', text: localize('引用与标题') });
+        this.heading(panelEl, localize('引用与标题'), 'ncl-theme-layout-section', 4);
         this.addThemeLayoutSlider(
             panelEl,
             'blockquoteIndent',

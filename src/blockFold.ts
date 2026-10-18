@@ -32,7 +32,7 @@ export const unfoldBlockEffect = StateEffect.define<{ from: number }>();
 
 class FoldEllipsisWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
-		const el = document.createElement("span");
+		const el = createSpan();
 		el.className = "ftn-fold-ellipsis";
 		el.textContent = "…";
 		el.setAttribute("aria-label", t("fold.expand"));

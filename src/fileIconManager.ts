@@ -112,7 +112,7 @@ export class FileIconManager {
         const selector = '.bucket-sidebar-root, .workspace-leaf-content, .workspace-tab-header';
         const observer = new win.MutationObserver(records => {
             if (records.some(record => Array.from(record.addedNodes).concat(Array.from(record.removedNodes))
-                .some(node => node instanceof win.Element && (node.matches(selector) || node.querySelector(selector))))) this.schedule();
+                .some(node => node.instanceOf(win.Element) && (node.matches(selector) || node.querySelector(selector))))) this.schedule();
         });
         observer.observe(doc.body, {childList: true, subtree: true});
         this.discovery.set(doc, observer);

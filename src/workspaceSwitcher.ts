@@ -64,7 +64,7 @@ export class WorkspaceSwitcher {
     private observed = new Set<Element>();
     private frame: number | null = null;
     private active = false;
-    private get win(): Window & typeof globalThis { return this.doc.defaultView as Window & typeof globalThis; }
+    private get win(): Window & typeof window { return this.doc.defaultView as Window & typeof window; }
     constructor(
         private app: App, private doc: Document, store: RecoveryStore,
         private coordinator: FloatingSurfaceCoordinator, private enabled: () => boolean,
@@ -83,9 +83,9 @@ export class WorkspaceSwitcher {
         this.observer = new this.win.MutationObserver(records => {
             if (records.some(r => {
                 if (this.item?.contains(r.target) || r.target === this.item) return false;
-                const parent = r.target instanceof this.win.Element ? r.target : r.target.parentElement;
+                const parent = r.target.instanceOf(this.win.Element) ? r.target : r.target.parentElement;
                 return parent?.closest('.status-bar') || [...Array.from(r.addedNodes), ...Array.from(r.removedNodes)]
-                    .some(n => n instanceof this.win.Element && (n.matches('.status-bar') || n.querySelector('.status-bar')));
+                    .some(n => n.instanceOf(this.win.Element) && (n.matches('.status-bar') || n.querySelector('.status-bar')));
             })) this.schedule();
         });
         this.observer.observe(this.doc.body, { childList: true, subtree: true, characterData: true });
@@ -148,7 +148,7 @@ export class WorkspaceSwitcher {
         let left = 0, right = bounds.width, top: number | null = null, wrapped = false;
         const observed = new Set<Element>([bar]);
         for (const sibling of Array.from(bar.children)) {
-            if (sibling === item || !(sibling instanceof this.win.HTMLElement)) continue;
+            if (sibling === item || !(sibling.instanceOf(this.win.HTMLElement))) continue;
             observed.add(sibling);
             const r = sibling.getBoundingClientRect();
             if (!r.width || !r.height || this.win.getComputedStyle(sibling).display === 'none') continue;

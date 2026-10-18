@@ -33,6 +33,10 @@ Marginalia 是独立插件，不包含在本包中；未安装时相关操作不
 
 ## 发行与许可
 
-首次公开双语预览版 **0.7.3**，发行前包含自动化模型测试和 macOS Obsidian 1.13.7 界面检查，不宣称所有老 Mac 和插件组合均已验证。反馈时请提供不含隐私的复现步骤。
+公开预览版 **0.7.4**。尚缺公开书面的上游独立发布同意，因此暂不提交 Community。自动化和 macOS 检查详见 [发行验证](RELEASE-VERIFICATION.md)，不宣称所有老 Mac 和插件组合均已验证。反馈时请提供不含隐私的复现步骤。构建还需运行 `pnpm lint`。
+
+## 来源
+
+Keyline 交互插件基于本地 Notion Markdown Guard 分叉；上游为 [Feel the Notion](https://github.com/MichaelNguyen5653/feel-the-notion) 0.6.0（快照 `92eea6ba535376e1e56527e5a28c3a11cc994c4d`）和 [BCS1037/notion-block](https://github.com/BCS1037/notion-block) 1.4.0。保留原 MIT 版权声明，独立名称不代表独立起源或获得上游背书。
 
 MIT，版权与第三方声明见 [LICENSE](LICENSE) 和 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

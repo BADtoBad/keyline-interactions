@@ -5,7 +5,7 @@ export type Layout = Record<string, unknown>;
 export interface WorkspaceCore {
     workspaces: Record<string, Layout>;
     activeWorkspace: string;
-    saveData(): Promise<unknown> | unknown;
+    saveData(): unknown;
     onOpenModal?(): void;
 }
 export interface LayoutRecovery { version: 1; savedAt: string; active: string; layout: Layout; }
@@ -20,7 +20,7 @@ export interface WorkspaceHost {
     changeLayout(layout: Layout): Promise<void>;
 }
 export const hasWorkspace = (core: WorkspaceCore, name: string): boolean =>
-    Object.prototype.hasOwnProperty.call(core.workspaces, name);
+    Object.prototype.hasOwnProperty.call(core.workspaces, name) === true;
 export function cloneLayout(value: unknown): Layout {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
         !(value as Layout).main || typeof (value as Layout).main !== 'object') {
@@ -43,7 +43,7 @@ export function alternatingRecoveryStore(adapter: {
         try {
             if (!await adapter.exists(path)) return { value: null, error: null };
             return { value: readRecovery(await adapter.read(path)), error: null };
-        } catch (error) { return { value: null, error }; }
+        } catch (error: unknown) { return { value: null, error }; }
     }));
     return {
         async read() {
@@ -67,7 +67,7 @@ export function validateWorkspaceName(value: string): string | null {
     const name = value.trim();
     if (!name) return localize('请输入布局名称。');
     // Older core management calls workspaces.hasOwnProperty directly.
-    if (/[\u0000-\u001f\u007f]/.test(name) || name === 'prototype' || Object.getOwnPropertyNames(Object.prototype).includes(name)) {
+    if ([...name].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127) || name === 'prototype' || Object.getOwnPropertyNames(Object.prototype).includes(name)) {
         return localize('此布局名称不可用，请换一个名称。');
     }
     return null;
@@ -134,7 +134,7 @@ export class WorkspaceLayouts {
             await this.host.changeLayout(cloneLayout(layout));
             core.activeWorkspace = active;
             await core.saveData();
-        } catch (cause) {
+        } catch {
             try {
                 await this.host.changeLayout(cloneLayout(before.layout));
                 core.activeWorkspace = before.active;
@@ -158,7 +158,7 @@ export class WorkspaceLayouts {
             core.workspaces[name] = next;
             core.activeWorkspace = name;
             try { await core.saveData(); }
-            catch (cause) {
+            catch {
                 if (exists) core.workspaces[name] = previous; else delete core.workspaces[name];
                 core.activeWorkspace = previousActive;
                 throw new Error(localize('布局未能保存，请检查配置目录的写入权限后重试。'));

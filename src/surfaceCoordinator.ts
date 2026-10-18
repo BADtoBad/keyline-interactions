@@ -61,12 +61,12 @@ export class FloatingSurfaceCoordinator {
 		this.activeByDocument.set(doc, active);
 		active.cleanup = this.bindViewportLifecycle(doc, token, options);
 		this.syncBodyState(doc);
-		const coordinator = this;
+		const isActive = () => this.isActive(doc, token);
 
 		return {
 			kind,
 			get active(): boolean {
-				return coordinator.isActive(doc, token);
+				return isActive();
 			},
 			release: () => this.release(doc, token),
 			close: (reason = "programmatic") => this.closeToken(doc, token, reason),

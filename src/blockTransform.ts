@@ -254,10 +254,7 @@ function sanitizeAttachmentName(name: string): string {
     // can resolve to "." or "..".
     const cleaned = name
         .replace(/[\\/:*?"<>|]/g, "-")
-        // eslint-disable-next-line no-control-regex -- matching control
-        // characters is the entire point here: they are what has to come out
-        // of a name that is about to become a file path.
-        .replace(/[\u0000-\u001f\u007f]/g, "-")
+        .split('').map(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 ? '-' : char).join('')
         .replace(/^\.+/, "")
         .trim();
     return cleaned || "attachment";

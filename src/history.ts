@@ -45,5 +45,5 @@ export function dispatchBlockEdit(view: EditorView, spec: TransactionSpec): void
 // have to survive being merged with the isolation annotation above.
 function toArray<T>(value: T | readonly T[] | undefined): readonly T[] {
 	if (value === undefined) return [];
-	return Array.isArray(value) ? value : [value as T];
+	return Array.isArray(value) ? value as readonly T[] : [value as T];
 }

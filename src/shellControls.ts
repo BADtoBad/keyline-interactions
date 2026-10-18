@@ -17,7 +17,7 @@ export class ShellControls {
     private dock: HTMLElement | null = null;
     private glyph: HTMLElement | null = null;
     private restore: Array<() => void> = [];
-    private get win(): Window & typeof globalThis { return this.doc.defaultView as Window & typeof globalThis; }
+    private get win(): Window & typeof window { return this.doc.defaultView as Window & typeof window; }
 
     private status: StatusBarPresentation;
     constructor(private doc: Document) { this.status = new StatusBarPresentation(doc); }
@@ -32,7 +32,7 @@ export class ShellControls {
             if (records.some(record => record.type === 'attributes'
                 ? [this.doc.body, this.workspace, this.dock, this.ribbon].includes(record.target as HTMLElement)
                 : [...Array.from(record.addedNodes), ...Array.from(record.removedNodes)].some(node =>
-                    node instanceof this.win.Element && (node.matches(shell) || node.querySelector(shell))))) this.schedule();
+                    node.instanceOf(this.win.Element) && (node.matches(shell) || node.querySelector(shell))))) this.schedule();
         });
         // Layout/CSS changes are also requested by the plugin.
         this.observer.observe(this.doc.body, { subtree: true, childList: true,
@@ -153,7 +153,7 @@ export class ShellControls {
         const open = workspace.classList.contains('is-left-sidedock-open');
         const wr = workspace.getBoundingClientRect(), dr = dock.getBoundingClientRect(), rr = ribbon.getBoundingClientRect();
         const ribbonVisible = rr.width > 0 && this.win.getComputedStyle(ribbon).display !== 'none';
-        const profile = this.profile!;
+        const profile = this.profile;
         if (profile.classList.contains('is-compact') === open) profile.classList.toggle('is-compact', !open);
         // Hidden ribbon + hidden dock means the user chose no navigation. Keep
         // native menu-bar/hotkeys; don't invent a floating third navigation area.

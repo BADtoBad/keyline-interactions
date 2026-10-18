@@ -41,7 +41,7 @@ export function isMentionTextBoundary(before: string): boolean {
 export function readMentionSession(text: string, from: number, head: number): MentionSession | null {
 	if (from < 0 || head <= from || head > text.length || text[from] !== "@") return null;
 	const query = text.slice(from + 1, head);
-	if (query.length > 120 || /[\r\n@\[\]]/u.test(query)) return null;
+	if (query.length > 120 || /[\r\n@[\]]/u.test(query)) return null;
 	return { from, to: head, query };
 }
 
@@ -63,5 +63,5 @@ export function findMentionPages(pages: readonly MentionPage[], query: string, l
 
 /** Do not manufacture ambiguous links from reserved filename characters. */
 export function mentionWikilink(linktext: string): string | null {
-	return linktext && !/[\[\]|#^\r\n]/u.test(linktext) ? `[[${linktext}]]` : null;
+	return linktext && !/[[\]|#^\r\n]/u.test(linktext) ? `[[${linktext}]]` : null;
 }

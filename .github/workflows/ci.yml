@@ -29,6 +29,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Obsidian guidelines
+        run: pnpm lint
+
       - name: Test
         run: pnpm pretest && pnpm test
 

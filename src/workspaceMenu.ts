@@ -13,7 +13,7 @@ export class WorkspaceMenu {
     private root: HTMLElement | null = null;
     private rows: HTMLButtonElement[] = [];
     private lease: FloatingSurfaceLease | null = null;
-    private get win(): Window & typeof globalThis { return this.doc.defaultView as Window & typeof globalThis; }
+    private get win(): Window & typeof window { return this.doc.defaultView as Window & typeof window; }
     constructor(private doc: Document, private anchor: HTMLButtonElement | null,
         private coordinator: FloatingSurfaceCoordinator, private onClose: () => void) {}
 

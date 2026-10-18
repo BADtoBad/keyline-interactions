@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+
+test('workspace names reject every ASCII control character', () => {
+    for (const code of [...Array.from({ length: 32 }, (_, i) => i), 127]) {
+        assert.ok(validateWorkspaceName(`layout${String.fromCharCode(code)}name`), String(code));
+    }
+});
 import { WorkspaceLayouts, alternatingRecoveryStore, cloneLayout, readRecovery, validateWorkspaceName, workspaceSlot } from './.build/workspaceLayouts.js';
 
 const copy = value => JSON.parse(JSON.stringify(value));

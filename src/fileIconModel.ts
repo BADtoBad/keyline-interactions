@@ -3,7 +3,7 @@ import { fileVisualKindForPath, FileVisualKind } from './nativeFileExplorerModel
 
 export type IconKind = FileVisualKind | 'folder';
 export const ICON_COLORS = ['gray', 'blue', 'red', 'green', 'purple', 'amber', 'cyan', 'orange', 'pink'] as const;
-export type IconColor = typeof ICON_COLORS[number] | string;
+export type IconColor = string;
 export interface IconOverride { icon?: string; color?: IconColor }
 export interface FileIconSettings {
     enabled: boolean;
@@ -41,9 +41,9 @@ export function normalizeFileIconSettings(value?: unknown): FileIconSettings {
     const v = record(value);
     const types = Object.fromEntries(Object.entries(record(v.types)).filter(([key]) => Object.prototype.hasOwnProperty.call(ICON_DEFAULTS, key))
         .map(([key, val]) => [key, normalizeIconOverride(val)]));
-    const files: Record<string, IconOverride> = Object.assign(Object.create(null), Object.fromEntries(
+    const files: Record<string, IconOverride> = Object.assign(Object.create(null) as Record<string, IconOverride>, Object.fromEntries(
         Object.entries(record(v.files)).filter(([key]) => key && !key.startsWith('/') && !key.split('/').some(p => p === '..' || p === '.'))
-        .map(([key, val]) => [key, normalizeIconOverride(val)]).filter(([, val]) => Object.keys(val).length)));
+        .map(([key, val]): [string, IconOverride] => [key, normalizeIconOverride(val)]).filter(([, val]) => Object.keys(val).length)));
     return { enabled: v.enabled !== false, monochrome: v.monochrome === true, types, files };
 }
 export interface ResolvedFileIcon { kind: IconKind; icon: string; color: IconColor; iconSource: string; colorSource: string }
