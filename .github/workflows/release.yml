@@ -1,0 +1,67 @@
+name: Release Obsidian Plugin
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      # Obsidian matches the release tag against manifest.json exactly. A
+      # mismatch still produces a GitHub Release, but one Obsidian will not
+      # serve, and nothing anywhere says why — so fail loudly here instead.
+      - name: Verify tag matches manifest version
+        run: |
+          MANIFEST=$(node -p "require('./manifest.json').version")
+          if [ "$GITHUB_REF_NAME" != "$MANIFEST" ]; then
+            echo "Tag '$GITHUB_REF_NAME' does not match manifest.json version '$MANIFEST'"
+            exit 1
+          fi
+          echo "Tag and manifest agree on $MANIFEST"
+
+      # A tag publishes straight to every user with no review in between, so
+      # the checks run here too rather than trusting that CI already saw this
+      # commit. A tag can point at anything.
+      - name: Build plugin
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm pretest
+          pnpm test
+          pnpm build
+
+      - name: Attest assets
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            main.js
+            manifest.json
+            styles.css
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

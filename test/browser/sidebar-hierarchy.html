@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Keyline native Sidebar hierarchy geometry</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      --font-interface: "JetBrains Mono NL", monospace;
+      font-family: var(--font-interface);
+      --border-width: 1px;
+      --indentation-guide-color: color-mix(in srgb, var(--text-normal) 12%, transparent);
+      --nav-item-padding: 4px 8px 4px 24px;
+      --nav-item-parent-padding: var(--nav-item-padding);
+      --nav-item-margin-bottom: 0px;
+      --nav-item-children-padding-start: 4px;
+      --nav-item-children-margin-start: 12px;
+      --nav-indentation-guide-width: var(--border-width);
+      --nav-indentation-guide-color: var(--indentation-guide-color);
+      margin: 0;
+    }
+
+    .workspace-leaf-content[data-type="file-explorer"] {
+      width: var(--fixture-width, 360px);
+      min-height: 260px;
+    }
+
+    .tree-item-self {
+      display: flex;
+      position: relative;
+      align-items: baseline;
+      margin-bottom: var(--nav-item-margin-bottom);
+      padding: var(--nav-item-padding);
+      font-weight: var(--nav-item-weight);
+    }
+
+    .tree-item-self.mod-collapsible {
+      padding: var(--nav-item-parent-padding);
+    }
+
+    .tree-item-self .tree-item-icon {
+      position: absolute;
+      display: flex;
+      width: 16px;
+      margin-inline-start: -20px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tree-item-children {
+      padding-inline-start: var(--nav-item-children-padding-start);
+      margin-inline-start: var(--nav-item-children-margin-start);
+      border-inline-start: var(--nav-indentation-guide-width) solid var(--nav-indentation-guide-color);
+    }
+
+    .nav-file-title-content,
+    .nav-folder-title-content {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    #result { font: 11px/1.5 monospace; color: var(--text-muted); white-space: pre-wrap; }
+    #editor-font-probe { font-family: var(--font-interface); }
+    .bucket-sidebar-root { padding: 8px; width: var(--fixture-width, 360px); }
+    body[data-preview="true"] #result,
+    body[data-preview="true"] #editor-font-probe { display: none; }
+  </style>
+  <link rel="stylesheet" href="../../../theme/Keyline/theme.css">
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="theme-dark" data-result="pending">
+  <script>
+    const fixtureParams = new URLSearchParams(location.search);
+    document.body.className = fixtureParams.get("theme") === "light" ? "theme-light" : "theme-dark";
+    document.body.style.setProperty("--fixture-width", fixtureParams.get("width") === "240" ? "240px" : "360px");
+    document.body.dataset.preview = String(fixtureParams.has("preview"));
+  </script>
+  <div class="workspace-leaf-content" data-type="file-explorer">
+    <div class="nav-files-container">
+      <div class="nav-folder mod-root">
+        <div class="nav-folder-children">
+          <div class="tree-item nav-folder" id="parent-folder">
+            <div class="tree-item-self mod-collapsible nav-folder-title ncl-native-row-enhanced">
+              <span class="tree-item-icon collapse-icon ncl-native-folder-icon-idle" id="parent-icon" aria-hidden="true">
+                <svg class="ncl-native-folder-open-glyph" viewBox="0 0 24 24"><path d="M5.5528 15.8944L8 11L22 11L19.0753 20L2 20L2 4L8 4L10 6L19 6L19 12"/></svg>
+              </span>
+              <div class="nav-folder-title-content" id="parent-text">03_工作</div>
+            </div>
+            <div class="tree-item-children nav-folder-children" id="parent-children">
+              <div class="tree-item nav-file">
+                <div class="tree-item-self nav-file-title ncl-native-row-enhanced is-active">
+                  <span class="tree-item-icon ncl-native-file-icon" id="child-icon" aria-hidden="true">
+                    <svg class="ncl-native-file-glyph" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M14 1C14.2652 1 14.5196 1.1054 14.7071 1.2929L20.7071 7.2929C20.8946 7.4804 21 7.7348 21 8L21 22C21 22.5523 20.5523 23 20 23L4 23C3.4477 23 3 22.5523 3 22L3 2C3 1.4477 3.4477 1 4 1L14 1ZM7 18L17 18L17 16L7 16L7 18ZM7 14L13 14L13 12L7 12L7 14ZM15 8L20 8L14 2L14 7C14 7.5523 14.4477 8 15 8Z"/></svg>
+                  </span>
+                  <div class="nav-file-title-content" id="child-text">updated test</div>
+                  <div class="ncl-native-row-actions"><button class="ncl-native-row-action" aria-label="更多操作">…</button></div>
+                </div>
+              </div>
+              <div class="tree-item nav-folder">
+                <div class="tree-item-self mod-collapsible nav-folder-title ncl-native-row-enhanced">
+                  <span class="tree-item-icon collapse-icon ncl-native-folder-icon-idle" id="child-folder-icon" aria-hidden="true">
+                    <svg class="ncl-native-folder-open-glyph" viewBox="0 0 24 24"><path d="M5.5528 15.8944L8 11L22 11L19.0753 20L2 20L2 4L8 4L10 6L19 6L19 12"/></svg>
+                  </span>
+                  <div class="nav-folder-title-content" id="child-folder-text">Marketing</div>
+                </div>
+                <div class="tree-item-children nav-folder-children" id="child-children">
+                  <div class="tree-item nav-file">
+                    <div class="tree-item-self nav-file-title ncl-native-row-enhanced">
+                      <span class="tree-item-icon ncl-native-file-icon" id="grandchild-icon" aria-hidden="true">
+                        <svg class="ncl-native-file-glyph" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M14 1C14.2652 1 14.5196 1.1054 14.7071 1.2929L20.7071 7.2929C20.8946 7.4804 21 7.7348 21 8L21 22C21 22.5523 20.5523 23 20 23L4 23C3.4477 23 3 22.5523 3 22L3 2C3 1.4477 3.4477 1 4 1L14 1ZM7 18L17 18L17 16L7 16L7 18ZM7 14L13 14L13 12L7 12L7 14ZM15 8L20 8L14 2L14 7C14 7.5523 14.4477 8 15 8Z"/></svg>
+                      </span>
+                      <div class="nav-file-title-content" id="grandchild-text">LiveSync-首次同步验证-20260904-中英文长文件名回归</div>
+                      <div class="ncl-native-row-actions"><button class="ncl-native-row-action" aria-label="更多操作">…</button></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tree-item nav-folder is-collapsed">
+        <div class="tree-item-self mod-collapsible nav-folder-title ncl-native-row-enhanced">
+          <span class="tree-item-icon collapse-icon ncl-native-folder-icon-idle" aria-hidden="true"><svg class="ncl-native-folder-glyph" viewBox="0 0 24 24"><path d="M3 3L9.5 3C9.7652 3 10.0196 3.1054 10.2071 3.2929L12.4142 5.5L21 5.5C21.5523 5.5 22 5.9477 22 6.5L22 20C22 20.5523 21.5523 21 21 21L3 21C2.4477 21 2 20.5523 2 20L2 4C2 3.4477 2.4477 3 3 3Z"/></svg></span>
+          <div class="nav-folder-title-content">04_个人</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bucket-sidebar-root">
+    <div class="bucket-header" id="bucket-header">工作项目</div>
+    <div class="bucket-entry-row" id="bucket-font-probe">秋季活动 · Campaign</div>
+  </div>
+  <div id="editor-font-probe">Editor / menu font remains JetBrains Mono</div>
+  <pre id="result">pending</pre>
+  <script>
+    document.fonts.ready.then(() => {
+      const byId = (id) => {
+        const element = document.getElementById(id);
+        if (!element) throw new Error(`missing fixture element: ${id}`);
+        return element;
+      };
+      const rect = (id) => byId(id).getBoundingClientRect();
+      const number = (value) => Number.parseFloat(value);
+      const near = (actual, expected, label, tolerance = 0.02) => {
+        if (Math.abs(actual - expected) > tolerance) {
+          throw new Error(`${label}: expected ${expected}, received ${actual}`);
+        }
+      };
+      const check = (condition, label) => { if (!condition) throw new Error(label); };
+      const rgb = (value) => value.match(/[\d.]+/g).map(Number);
+      const composite = (front, back) => front.slice(0, 3).map((c, i) => c * (front[3] ?? 1) + back[i] * (1 - (front[3] ?? 1)));
+      const luminance = (value) => value.slice(0, 3).map(c => c / 255).map(c => c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4).reduce((n, c, i) => n + c * [0.2126, 0.7152, 0.0722][i], 0);
+      const contrast = (a, b) => (Math.max(luminance(a), luminance(b)) + 0.05) / (Math.min(luminance(a), luminance(b)) + 0.05);
+
+      try {
+        const parentIcon = rect("parent-icon");
+        const parentText = rect("parent-text");
+        const childIcon = rect("child-icon");
+        const childText = rect("child-text");
+        const childFolderText = rect("child-folder-text");
+        const grandchildIcon = rect("grandchild-icon");
+        const grandchildText = rect("grandchild-text");
+        const parentChildren = byId("parent-children");
+        const childChildren = byId("child-children");
+        const parentChildrenStyle = getComputedStyle(parentChildren);
+        const childChildrenStyle = getComputedStyle(childChildren);
+        const guideWidth = number(parentChildrenStyle.borderInlineStartWidth);
+        const guideAxis = parentChildren.getBoundingClientRect().left;
+        const depthStep = number(parentChildrenStyle.marginInlineStart)
+          + guideWidth
+          + number(parentChildrenStyle.paddingInlineStart);
+
+        near(childIcon.left, parentText.left, "child icon / parent text alignment");
+        near(grandchildIcon.left, childFolderText.left, "grandchild icon / child text alignment");
+        near(childText.left - parentText.left, 20, "first text-axis depth step");
+        near(grandchildText.left - childFolderText.left, 20, "second text-axis depth step");
+        near(depthStep, 20, "native margin + guide + padding depth step");
+        near(guideWidth, 1, "native hierarchy guide width");
+        near(guideAxis, parentIcon.left + parentIcon.width / 2, "guide / parent icon centre alignment");
+        near(childChildren.getBoundingClientRect().left, byId("child-folder-icon").getBoundingClientRect().left + 8, "second guide / icon centre alignment");
+
+        const rowHeights = Array.from(document.querySelectorAll(".tree-item-self"), (row) => row.getBoundingClientRect().height);
+        for (const height of rowHeights) near(height, 34, "source-list row height");
+
+        const labelStyle = getComputedStyle(byId("parent-text"));
+        const activeStyle = getComputedStyle(byId("child-text"));
+        const longLabel = byId("grandchild-text");
+        check(labelStyle.fontFamily.includes("-apple-system"), "Sidebar must use the system interface font");
+        check(getComputedStyle(byId("bucket-font-probe")).fontFamily === labelStyle.fontFamily, "Bucket must share the Sidebar font");
+        check(getComputedStyle(byId("editor-font-probe")).fontFamily.includes("JetBrains"), "Sidebar font must not leak to editor or menus");
+        near(number(labelStyle.fontWeight), 400, "regular folder label weight");
+        near(number(activeStyle.fontWeight), 500, "selected label weight");
+        check(getComputedStyle(longLabel).display === "block" && getComputedStyle(longLabel).textOverflow === "ellipsis", "native label box must support ellipsis");
+        check(longLabel.scrollWidth > longLabel.clientWidth, "fixture must exercise a truncated long label");
+        check(longLabel.getBoundingClientRect().right <= longLabel.nextElementSibling.getBoundingClientRect().left + 0.02, "long labels must not overlap row actions");
+        const action = document.querySelector(".ncl-native-row-action");
+        action.focus();
+        check(action.matches(":focus-visible") && getComputedStyle(action).outlineStyle === "solid", "row actions must retain visible keyboard focus");
+        action.blur();
+        const canvas = rgb(getComputedStyle(document.querySelector(".nav-files-container").parentElement).backgroundColor);
+        const selection = rgb(getComputedStyle(byId("child-text").parentElement).backgroundColor);
+        const normalContrast = contrast(rgb(labelStyle.color), canvas);
+        const selectedContrast = contrast(rgb(activeStyle.color), composite(selection, canvas));
+        check(normalContrast >= 4.5 && selectedContrast >= 4.5, `Sidebar text contrast must pass 4.5:1: normal=${normalContrast}, selected=${selectedContrast}, background=${canvas}, selectedColor=${activeStyle.color}`);
+
+        const metrics = {
+          depthStep,
+          guideWidth,
+          guideAxis,
+          parentIconLeft: parentIcon.left,
+          parentTextLeft: parentText.left,
+          childIconLeft: childIcon.left,
+          childTextLeft: childText.left,
+          grandchildIconLeft: grandchildIcon.left,
+          grandchildTextLeft: grandchildText.left,
+          rowHeights,
+          theme: document.body.className,
+          font: labelStyle.fontFamily,
+          normalContrast,
+          selectedContrast,
+          longLabelWidth: longLabel.clientWidth,
+        };
+        document.body.dataset.metrics = JSON.stringify(metrics);
+        document.body.dataset.result = "pass";
+        byId("result").textContent = JSON.stringify(metrics, null, 2);
+      } catch (error) {
+        document.body.dataset.result = "fail";
+        byId("result").textContent = error instanceof Error ? error.stack || error.message : String(error);
+      }
+    });
+  </script>
+</body>
+</html>

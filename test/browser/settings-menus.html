@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Keyline settings and menu surface regression</title>
+  <!-- NATIVE_CSS -->
+  <link rel="stylesheet" href="../../../theme/Keyline/theme.css">
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    html { height: auto; overflow: auto; }
+    body.fixture-body { position: static; display: block; overflow: visible; height: auto; min-height: 100vh; contain: none; margin: 0; padding: 24px; background: var(--background-primary); }
+    .fixture-caption { color: var(--text-muted); font: 12px/1.5 -apple-system, sans-serif; margin-bottom: 16px; }
+    .fixture-menus { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+    .fixture-menus > :is(.menu, .wk-nb-action-menu, .suggestion-container) { position: relative; inset: auto; width: 240px; max-width: 100%; }
+    .fixture-panel { max-width: 680px; }
+    .fixture-body #result { font: 11px/1.4 monospace; white-space: pre-wrap; }
+  </style>
+</head>
+<body class="fixture-body mod-macos" data-result="pending">
+  <div class="fixture-caption">Keyline · 隔离界面验证（使用本机 Obsidian 原生 CSS，并非真实应用截图）</div>
+  <div class="fixture-menus">
+    <div class="menu" role="menu" aria-label="原生菜单">
+      <div class="menu-item selected" role="menuitem"><div class="menu-item-icon">↗</div><div class="menu-item-title">在新标签页中打开</div><div class="menu-item-shortcut">⌘↵</div></div>
+      <div class="menu-item" role="menuitem"><div class="menu-item-icon">↗</div><div class="menu-item-title">在新窗口中打开</div></div>
+      <div class="menu-separator"></div>
+      <div class="menu-item is-disabled selected" role="menuitem" aria-disabled="true"><div class="menu-item-icon">↶</div><div class="menu-item-title">撤销</div><div class="menu-item-shortcut">⌘Z</div></div>
+      <div class="menu-item is-warning" role="menuitem"><div class="menu-item-title">删除</div></div>
+    </div>
+    <div class="wk-nb-action-menu" role="menu" aria-label="区块菜单">
+      <div class="wk-nb-action-menu-row is-active" role="menuitem" tabindex="0"><span class="wk-nb-action-menu-icon">T</span><span class="wk-nb-action-menu-label">转换成</span><span class="wk-nb-action-menu-shortcut">⌘/</span><span class="wk-nb-action-menu-chevron">›</span></div>
+      <div class="wk-nb-action-menu-row" role="menuitem"><span class="wk-nb-action-menu-icon">+</span><span class="wk-nb-action-menu-label">新增</span><span class="wk-nb-action-menu-chevron">›</span></div>
+      <div class="wk-nb-action-menu-separator"></div>
+      <div class="wk-nb-action-menu-row" role="menuitem"><span class="wk-nb-action-menu-icon">A</span><span class="wk-nb-action-menu-label">颜色</span><span class="wk-nb-action-menu-chevron">›</span></div>
+    </div>
+    <div class="suggestion-container"><div class="suggestion-item is-selected">正文 · 当前建议</div><div class="suggestion-item">标题 · 下一建议</div></div>
+  </div>
+  <div class="fixture-panel ncl-theme-layout-panel">
+    <div class="setting-item setting-item-heading"><div class="setting-item-info"><div class="setting-item-name">Keyline · 排版</div><div class="setting-item-description">修改后即时生效，当前排版已保存为主题默认。</div></div><div class="setting-item-control"><button>恢复主题默认</button></div></div>
+  </div>
+  <pre id="result"></pre>
+  <script>
+    const fixtureData = /* SETTINGS_DATA */ null;
+    document.body.classList.add('theme-' + (new URLSearchParams(location.search).get('theme') || 'dark'));
+    const paneWidth = Number(new URLSearchParams(location.search).get('width') || 900);
+    document.body.style.width = `min(${paneWidth}px, 100%)`;
+    const panel = document.querySelector('.ncl-theme-layout-panel');
+    for (const row of fixtureData) {
+      if (row.section) { const heading = document.createElement('h3'); heading.className = 'ncl-theme-layout-section'; heading.textContent = row.section; panel.append(heading); }
+      const item = document.createElement('div'); item.className = 'setting-item';
+      item.innerHTML = '<div class="setting-item-info"><div class="setting-item-name"></div><div class="setting-item-description"></div></div><div class="setting-item-control"><output></output><input type="range"></div>';
+      item.querySelector('.setting-item-name').textContent = row.name;
+      item.querySelector('.setting-item-description').textContent = row.description;
+      item.querySelector('output').textContent = row.formatted;
+      const slider = item.querySelector('input');
+      Object.assign(slider, { min: row.min, max: row.max, step: row.step, value: row.value });
+      slider.setAttribute('aria-label', row.name); slider.setAttribute('aria-valuetext', row.formatted);
+      panel.append(item);
+    }
+    document.fonts.ready.then(() => {
+      const assert = (ok, message) => { if (!ok) throw Error(message); };
+      const style = selector => getComputedStyle(document.querySelector(selector));
+      const rgb = css => { const ctx = document.createElement('canvas').getContext('2d'); ctx.fillStyle = css; ctx.fillRect(0,0,1,1); return Array.from(ctx.getImageData(0,0,1,1).data).slice(0,3); };
+      const luminance = css => rgb(css).map(c=>c/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4).reduce((s,c,i)=>s+c*[.2126,.7152,.0722][i],0);
+      const contrast = (fg,bg) => { const a=luminance(fg),b=luminance(bg); return (Math.max(a,b)+.05)/(Math.min(a,b)+.05); };
+      try {
+        assert(fixtureData.length === 16, 'all 16 production settings are represented');
+        assert(panel.querySelectorAll('h3').length === 4, 'four named settings sections');
+        assert(document.documentElement.scrollWidth <= document.documentElement.clientWidth, 'no horizontal page overflow');
+        assert(document.body.getBoundingClientRect().width === Math.min(paneWidth, document.documentElement.clientWidth), 'test uses the requested pane width even when Chrome has a minimum window size');
+        for (const item of panel.querySelectorAll('.setting-item')) {
+          assert(getComputedStyle(item).borderRadius === '0px', 'flat settings rows');
+          const row = item.getBoundingClientRect();
+          for (const child of item.querySelectorAll('.setting-item-info, .setting-item-control, input')) {
+            const box = child.getBoundingClientRect();
+            assert(box.left >= row.left - 1 && box.right <= row.right + 1, 'controls remain inside row');
+          }
+        }
+        const native = style('.menu-item.selected:not(.is-disabled)');
+        const custom = style('.wk-nb-action-menu-row.is-active');
+        assert(native.backgroundColor === custom.backgroundColor, 'native and custom menu selection match');
+        assert(native.backgroundColor === style('.suggestion-item.is-selected').backgroundColor, 'suggestion selection matches');
+        assert(style('.menu-item.is-disabled').backgroundColor !== native.backgroundColor, 'disabled row is not highlighted');
+        assert(style('.menu-item.is-disabled').cursor === 'default', 'disabled cursor stays native');
+        const ratios = [
+          contrast(native.color,native.backgroundColor),
+          contrast(style('.menu-item.selected:not(.is-disabled) .menu-item-shortcut').color,native.backgroundColor),
+          contrast(custom.color,custom.backgroundColor),
+          contrast(style('.wk-nb-action-menu-row.is-active .wk-nb-action-menu-shortcut').color,custom.backgroundColor),
+          contrast(style('.setting-item-description').color,style('body').backgroundColor)
+        ];
+        assert(Math.min(...ratios)>=4.5, 'labels, selected shortcuts, descriptions meet 4.5:1 contrast');
+        const input = panel.querySelector('input'); input.focus({preventScroll:true});
+        assert(document.activeElement === input && getComputedStyle(input).outlineStyle !== 'none', 'native slider has visible keyboard focus');
+        document.querySelector('#result').textContent = JSON.stringify({ theme: document.body.className, viewport: innerWidth, paneWidth, settings: fixtureData.length, sections: 4, minimumContrast: Math.min(...ratios).toFixed(2) });
+        document.body.dataset.result = 'pass';
+      } catch (error) { document.body.dataset.result = 'fail'; document.querySelector('#result').textContent = error.stack; }
+    });
+  </script>
+</body>
+</html>

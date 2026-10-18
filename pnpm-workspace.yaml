@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - esbuild
+overrides:
+  '@codemirror/state': 6.5.0

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>Keyline native property styling fixture</title>
+<!-- NATIVE_CSS --><!-- THEME_CSS --><!-- PLUGIN_CSS -->
+<style>
+body { overflow:auto; background:var(--background-primary); }
+#fixture { width:calc(100% - 48px); max-width:640px; margin:24px auto; height:auto; }
+#note { padding:0; height:auto; }
+.inline-title { margin:0 0 24px; }
+#outside { margin-top:32px; }
+</style></head><body class="theme-light is-focused mod-macos show-inline-title">
+<main id="fixture" class="workspace-leaf-content" data-type="markdown"><div id="note" class="markdown-preview-view show-properties">
+<div class="inline-title">秋季活动策划案</div>
+<div class="metadata-container" tabindex="-1" data-property-count="7"><div class="metadata-content">
+<div class="metadata-properties-heading" tabindex="0" role="button" aria-expanded="true"><span class="collapse-indicator" data-icon="chevron-down"></span><span class="metadata-properties-title">笔记属性</span></div>
+<div class="metadata-properties">
+<div class="metadata-property" data-property-key="cssclasses"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="list" aria-label="列表类型"></span><input class="metadata-property-key-input" type="text" value="cssclasses" aria-label="属性名 cssclasses"></div><div class="metadata-property-value" data-property-type="multitext"><div class="multi-select-container"><div class="multi-select-pill"><span class="multi-select-pill-content">project-note</span><span class="multi-select-pill-remove-button" tabindex="0" role="button" aria-label="移除 project-note" data-icon="x"></span></div><div class="multi-select-input" contenteditable="true" tabindex="0" role="textbox" aria-label="添加类名"></div></div></div></div>
+<div class="metadata-property" data-property-key="负责人"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="file-text" aria-label="文本类型"></span><input class="metadata-property-key-input" type="text" value="负责人" aria-label="负责人属性名"></div><div class="metadata-property-value" data-property-type="text"><div class="metadata-input metadata-input-longtext" contenteditable="true" role="textbox" aria-label="负责人">Charlie</div></div></div>
+<div class="metadata-property" data-property-key="预算"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="list-ordered" aria-label="数字类型"></span><input class="metadata-property-key-input" type="text" value="预算" aria-label="预算属性名"></div><div class="metadata-property-value" data-property-type="number"><input class="metadata-input metadata-input-number" type="number" value="1200" aria-label="预算"></div></div>
+<div class="metadata-property" data-property-key="日期"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="calendar" aria-label="日期类型"></span><input class="metadata-property-key-input" type="text" value="日期" aria-label="日期属性名"></div><div class="metadata-property-value" data-property-type="date"><input class="metadata-input metadata-input-text mod-date" type="date" value="2026-09-09" aria-label="日期"></div></div>
+<div class="metadata-property" data-property-key="完成"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="layout-grid" aria-label="复选框类型"></span><input class="metadata-property-key-input" type="text" value="完成" aria-label="完成属性名"></div><div class="metadata-property-value" data-property-type="checkbox"><input class="metadata-input metadata-input-checkbox" type="checkbox" aria-label="完成"></div></div>
+<div class="metadata-property" data-property-key="标签"><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="layers" aria-label="标签类型"></span><input class="metadata-property-key-input" type="text" value="标签" aria-label="标签属性名"></div><div class="metadata-property-value" data-property-type="tags"><div class="multi-select-container"><div class="multi-select-pill"><span class="multi-select-pill-content">项目</span><span class="multi-select-pill-remove-button" tabindex="0" role="button" aria-label="移除项目标签" data-icon="x"></span></div><div class="multi-select-pill"><span class="multi-select-pill-content">秋季活动</span><span class="multi-select-pill-remove-button" tabindex="0" role="button" aria-label="移除秋季活动标签" data-icon="x"></span></div><div class="multi-select-input" contenteditable="true" tabindex="0" role="textbox" aria-label="添加标签"></div></div></div></div>
+<div class="metadata-property" data-property-key=""><div class="metadata-property-key"><span class="metadata-property-icon" data-icon="file-text" aria-label="文本类型"></span><input class="metadata-property-key-input" type="text" value="" placeholder="属性名" aria-label="空属性名"></div><div class="metadata-property-value" data-property-type="text"><div class="metadata-input metadata-input-longtext" contenteditable="true" role="textbox" aria-label="说明">一段较长的说明，用来确认窄窗下值仍然可见，并且不会挤坏属性名的对齐。</div></div></div>
+</div><div class="metadata-add-button text-icon-button" tabindex="0" role="button"><span class="text-button-icon" data-icon="plus"></span><span>添加笔记属性</span></div>
+</div></div>
+<p>正文内容保持原来的字体和行距。</p></div>
+<div id="outside" data-type="file-properties"><input type="text" aria-label="普通输入框" value="普通输入框不受属性样式影响"></div>
+</main>
+<script>
+const params=new URLSearchParams(location.search);
+document.body.classList.toggle('theme-dark',params.get('theme')==='dark');document.body.classList.toggle('theme-light',params.get('theme')!=='dark');
+if(params.get('mode')==='live')document.querySelector('#note').className='markdown-source-view mod-cm6 is-live-preview show-properties';
+const data=/* ICON_DATA */ {};
+const schemas=[['line','x1','y1','x2','y2'],['circle','cx','cy','r'],['polyline','points'],['polygon','points'],['ellipse','cx','cy','rx','ry'],['rect','x','y','width','height','rx','ry','transform'],['path','d']];
+const make=(tag,attrs)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,v);return el;};
+document.querySelectorAll('[data-icon]').forEach(el=>{const svg=make('svg',{class:'svg-icon',viewBox:'0 0 24 24',width:24,height:24,fill:'none',stroke:'currentColor','stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'});for(const [type,...values] of data[el.dataset.icon]){const [tag,...keys]=schemas[type];svg.append(make(tag,Object.fromEntries(keys.flatMap((key,i)=>values[i]===undefined?[]:[[key,values[i]]]))));}el.append(svg);});
+document.fonts.ready.then(()=>document.body.dataset.ready='true');
+</script></body></html>

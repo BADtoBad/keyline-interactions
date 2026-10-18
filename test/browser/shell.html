@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>Keyline Quiet — isolated native shell regression</title>
+<!-- NATIVE_CSS --><!-- THEME_CSS --><!-- PLUGIN_CSS -->
+<style>
+/* The host window and pane sizes are fixture state, not shipped styles. */
+body { margin:0; --font-interface:"JetBrains Mono NL",monospace; }
+#frame { position:absolute; inset:17px; width:auto; height:auto; overflow:hidden; border:1px solid var(--background-modifier-border); border-radius:12px; }
+#shell { --ribbon-width:52px; display:flex; overflow:hidden; }
+#ribbon { flex:0 0 var(--ribbon-width); width:var(--ribbon-width); margin:0; padding-top:48px; display:flex; flex-direction:column; align-items:center; }
+#ribbon .clickable-icon { width:28px; height:34px; }
+#ribbon :is(.side-dock-actions,.side-dock-settings) { width:100%; }
+#left { flex:0 0 auto; width:334px; min-width:0; display:flex; flex-direction:column; }
+#left > .workspace-tabs { flex:1; min-height:0; }
+#left .workspace-tab-container { flex:1; min-height:0; }
+#left .workspace-leaf { flex:1; }
+#left .workspace-leaf-content { display:flex; flex-direction:column; }
+#left .workspace-sidedock-vault-profile { min-height:36px; font-size:12px; }
+#center { flex:1 1 0; min-width:0; display:flex; }
+#center > .workspace-tabs { flex:1; min-width:0; }
+#right { flex:0 0 250px; width:250px; min-width:0; display:flex; flex-direction:column; }
+#right > .workspace-tab-header-container { flex:0 0 48px; }
+#left .workspace-leaf-content { flex:1; min-height:0; }
+#left .nav-files-container { flex:1; overflow:auto; }
+#left .workspace-tab-header-container { align-items:center; }
+#left .sidebar-toggle-button { margin-left:auto; }
+#center .workspace-tab-container { flex:1; min-height:0; }
+#center .workspace-leaf { width:100%; height:100%; }
+#center .workspace-leaf-content { height:100%; display:flex; flex-direction:column; }
+#center .markdown-reading-view { flex:1; min-height:0; overflow:auto; }
+#article { max-width:600px; margin:auto; padding:48px 0; font:16px/var(--ncl-reading-line-height) "JetBrains Mono NL", sans-serif; }
+#article h3 { font-size:18px; margin:48px 0; font-weight:600; }
+#article p { margin:0 0 48px; }
+#right .workspace-leaf-content[data-type="outline"] { flex:1; min-height:0; overflow:auto; padding:8px; }
+#right .workspace-leaf-content[data-type="calendar"] { flex:0 0 235px; padding:18px; }
+.calendar-heading { display:flex; align-items:center; gap:4px; margin-bottom:16px; font-size:23px; }
+.calendar-heading .year { color:var(--text-accent); }
+.calendar-heading button { margin-left:auto; width:26px; padding:4px; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:12px 4px; font-size:12px; text-align:center; }
+.calendar-grid .weekday { font-size:10px; color:var(--text-muted); }
+#result { display:none; }
+body.no-right #right, body.no-sidebars :is(#left,#right,#ribbon) { display:none; }
+body.no-ribbon #ribbon, body.left-collapsed #left { display:none; }
+body.no-sidebars { --frame-left-space:80px; }
+@media (max-width:1100px) { #left { width:240px; } #right { flex-basis:200px; } #article { padding:28px; } }
+</style></head><body class="theme-dark is-focused mod-macos is-hidden-frameless obsidian-app show-view-header show-ribbon">
+<div id="frame" class="app-container"><div class="horizontal-main-container"><div id="shell" class="workspace is-left-sidedock-open">
+  <div id="ribbon" class="workspace-ribbon mod-left"></div>
+  <div id="left" class="workspace-split mod-sidedock mod-left-split mod-horizontal">
+    <div class="workspace-leaf-resize-handle"></div>
+    <div class="workspace-tabs mod-top mod-top-left-space" style="--frame-left-space: 32px">
+    <div class="workspace-tab-header-container"><div class="workspace-tab-header-container-inner" id="sidebar-tabs"></div><div class="sidebar-toggle-button"><button class="clickable-icon" data-icon="panel-left" aria-label="收起侧栏"></button></div></div>
+    <div class="workspace-tab-container"><div class="workspace-leaf"><div class="workspace-leaf-content" data-type="file-explorer"><div class="nav-header"><div class="nav-buttons-container"><button class="nav-action-button clickable-icon" data-icon="plus" aria-label="新建"></button></div></div><div class="nav-files-container"></div></div></div></div>
+    </div>
+    <div class="workspace-sidedock-vault-profile"><div class="workspace-drawer-vault-switcher"><div class="workspace-drawer-vault-switcher-icon" data-icon="chevrons-up-down"></div><div class="workspace-drawer-vault-name">plugin-test</div></div><div class="workspace-drawer-vault-actions"><span class="clickable-icon" data-icon="circle-help"></span><span class="clickable-icon" data-icon="settings"></span></div></div>
+  </div>
+  <div id="center" class="workspace-split mod-root"><div class="workspace-tabs">
+    <div class="workspace-tab-header-container"><div class="workspace-tab-header-container-inner" id="tabs"></div><div class="workspace-tab-header-new-tab"><span class="clickable-icon" data-icon="plus" role="button" tabindex="0" aria-label="新标签"></span></div><div class="workspace-tab-header-spacer"></div><div class="workspace-tab-header-tab-list"><span class="clickable-icon" data-icon="chevron-down" role="button" tabindex="0" aria-label="标签列表"></span></div></div>
+    <div class="workspace-tab-container"><div class="workspace-leaf"><div class="workspace-leaf-content" data-type="markdown"><div class="view-header"><div class="view-header-nav-buttons"><button class="clickable-icon" data-icon="chevron-left" aria-label="后退"></button><button class="clickable-icon" data-icon="chevron-right" aria-label="前进"></button></div><div class="view-header-title-container mod-at-start"><div class="view-header-title-parent"><span class="view-header-breadcrumb">03_工作</span><span class="view-header-breadcrumb-separator">/</span><span class="view-header-breadcrumb">Marketing</span><span class="view-header-breadcrumb-separator">/</span><span class="view-header-breadcrumb">Campaigns</span><span class="view-header-breadcrumb-separator">/</span></div><div class="view-header-title">秋季活动策划案</div></div><div class="view-actions"><button class="view-action clickable-icon" data-icon="book-open" aria-label="阅读视图"></button><button class="view-action clickable-icon" data-icon="ellipsis" aria-label="更多"></button></div></div>
+    <div class="markdown-reading-view"><article id="article"><p>它被称为“自我改进”的智能体，原因并不是它会凭空改变目标，而是把反馈变成可检查的改进。</p><h3>闭环实战：Warp 的 Issue 分流智能体</h3><p><a>Warp 的 Issue 分流智能体</a> 展示了这套自我改进 Skill 框架。Issue 被提交时，会启动一个智能体，分析它的可行性、分配标签，并建议修复方向。</p><p>在一个示例 Issue 中，第一阶段的内部 Skill 整体表现不错，却漏掉了一个标签。该标签表示可以直接由智能体从头到尾修复这个 Issue，无需产品与技术规范。</p><p>外部改进器 Skill 作为定时的“更新分派器”运行，拉取刚关闭的 Issue，把内容汇总成一份 JSON 文件，然后重新注入上下文。</p><p>接下来，智能体维护者识别出具体反馈信号，然后做出最小修改。它创建了一个修改内部 Skill 的 PR，让缺少明确 UI 或 UX 形态的问题也可以进入下一步。</p><p>整套更新只是一个 Skill 文件，可以沿用常规代码评审流程，清楚说明每个修改的依据。</p></article></div>
+    </div></div></div>
+  </div></div>
+  <div id="right" class="workspace-split mod-right-split"><div class="workspace-tab-header-container"><div class="clickable-icon" data-icon="list"></div></div><div class="workspace-leaf-content" data-type="outline"><div class="tree-item-self">总结摘要</div><div class="tree-item-self">中文译文</div><div class="tree-item-children"><div class="tree-item-self">基于 Skills 的智能体自我改进闭环</div><div class="tree-item-self">如何为智能体编写自我改进的 Skill</div><div class="tree-item-self is-active">闭环实战：Warp 的 Issue 分流智能体</div></div><div class="tree-item-self">原文</div><div class="tree-item-self">Agent self-improvement loop built on skills</div><div class="tree-item-self">How to write self-improving skills for agents</div><div class="tree-item-self">The loop in action: Warp’s issue triage agent</div></div><div class="workspace-leaf-content" data-type="calendar"><div class="calendar-heading">9月 <span class="year">2026</span><button class="clickable-icon" data-icon="chevron-left" aria-label="上一月"></button></div><div class="calendar-grid"></div></div></div>
+</div></div><div class="status-bar"><div class="status-bar-item mod-clickable" tabindex="0" role="button">0 条反向链接</div><div class="status-bar-item plugin-editor-status mod-clickable" tabindex="0" role="button" aria-label="切换编辑模式"><span class="status-bar-item-icon" data-icon="pencil"></span></div><div class="status-bar-item"><span class="status-bar-item-segment">72 个词</span><span class="status-bar-item-segment">140 个字符</span></div><div class="status-bar-item plugin-sync mod-clickable" tabindex="0" role="button" aria-label="同步已暂停" data-icon="refresh-cw-off" style="color:var(--text-error)"></div><div class="status-bar-item">Sync: ↑ 0 ↓ 0</div></div></div><pre id="result">pending</pre>
+<script>
+const params=new URLSearchParams(location.search);document.body.classList.toggle('theme-light',params.get('theme')==='light');document.body.classList.toggle('theme-dark',params.get('theme')!=='light');
+const frame=params.get('frame')||'normal';
+if(params.has('ribbon'))document.querySelector('#shell').style.setProperty('--ribbon-width',`${Number(params.get('ribbon'))}px`);
+const leftVisible=!['no-sidebars','left-collapsed'].includes(frame);
+document.body.classList.toggle('no-right',frame==='no-right');document.body.classList.toggle('no-sidebars',frame==='no-sidebars');
+document.body.classList.toggle('no-ribbon',frame==='no-ribbon');document.body.classList.toggle('left-collapsed',frame==='left-collapsed');
+document.body.classList.toggle('show-ribbon',!['no-sidebars','no-ribbon'].includes(frame));
+document.querySelector('#shell').classList.toggle('is-left-sidedock-open',leftVisible);
+document.querySelector('#left').classList.toggle('is-sidedock-collapsed',!leftVisible);
+document.querySelector('#ribbon').classList.toggle('is-collapsed',!leftVisible);
+if(frame==='wide-left')document.querySelector('#left').style.width='400px';
+if(frame==='no-sidebars')document.querySelector('#center > .workspace-tabs').classList.add('mod-top-left-space');
+const iconData=/* ICON_DATA */ {};
+window.fixtureIconNames=Object.keys(iconData);
+// Obsidian convenience DOM methods used by the production picker. No app
+// persistence/commands are replaced; those remain an explicit fixture seam.
+HTMLElement.prototype.createEl=function(tag,options={}){const el=document.createElement(tag);for(const [k,v] of Object.entries(options)){if(k==='text')el.textContent=v;else if(k==='cls')el.className=v;else el.setAttribute(k,v);}this.append(el);return el;};
+HTMLElement.prototype.createDiv=function(options){return this.createEl('div',options);};
+HTMLElement.prototype.createSpan=function(options){return this.createEl('span',options);};
+window.nativeIcon = name => {
+  const data=iconData[name]; if(!data)return null;
+  const make=(tag,attrs)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [key,value] of Object.entries(attrs))el.setAttribute(key,value);return el;};
+  const svg=make('svg',{viewBox:'0 0 24 24',width:24,height:24,fill:'none',stroke:'currentColor','stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',class:'svg-icon lucide-'+name});
+  const schemas=[['line','x1','y1','x2','y2'],['circle','cx','cy','r'],['polyline','points'],['polygon','points'],['ellipse','cx','cy','rx','ry'],['rect','x','y','width','height','rx','ry','transform'],['path','d']];
+  for(const [type,...values] of data){const [tag,...keys]=schemas[type];const attrs=Object.fromEntries(keys.flatMap((k,i)=>values[i]===undefined?[]:[[k,values[i]]]));if((type===1&&values[3])||(type===6&&values[1]))attrs.fill='currentColor';svg.append(make(tag,attrs));}return svg;
+};
+const escapeHTML=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');
+const row=(label,folder=false,children='',active=false)=>`<div class="tree-item ${folder?'nav-folder':'nav-file'} ${folder&&!children?'is-collapsed':''}"><div tabindex="0" data-path="${escapeHTML(label)}${folder?'':'.md'}" class="tree-item-self ${folder?'mod-collapsible nav-folder-title':'nav-file-title'} ${active?'is-active':''}">${folder?`<span class="tree-item-icon collapse-icon ${!children?'is-collapsed':''}" data-icon="chevron-down"></span>`:''}<div class="${folder?'nav-folder-title-content':'nav-file-title-content'}">${escapeHTML(label)}</div></div>${children?`<div class="tree-item-children nav-folder-children">${children}</div>`:''}</div>`;
+const articles=['为什么中国大学已经事实性崩溃？','Andrew Huberman | My Exact Routine','Base UI vs Radix - I Tested Both','How I use Obsidian + Claude Cowork','How our agents build on-brand pages','How our agents build on-brand pages…','How Warp builds self-improving agents','Nick Milo Reads My Obsidian Vault Live','Obsidian replaced the app I built.','RAG Kills Notion, Obsidian, and Your…','Running a Software Factory Efficiently','Stop Watching Tutorials - Build These','The Cognitive Revolution When Models','Turn Any Book Into an AI Skill','What Nobody Tells You About Building'];
+document.querySelector('.nav-files-container').innerHTML=row('000_系统',true)+row('000_Inbox',true)+row('001_web_inbox',true,row('001_Get笔记',true)+row('002_web_clip',true,articles.map((s,i)=>row(s,false,'',i===6)).join('')))+['100_input','200_output','300_work','800_模版','900_归档','990_附件'].map(s=>row(s,true)).join('');
+document.querySelector('#ribbon').innerHTML='<div class="side-dock-actions">'+['list-ordered','list','file-text','git-branch','layout-grid','calendar','copy','layers','book-open','archive'].map(n=>`<button class="side-dock-ribbon-action clickable-icon" data-icon="${n}" aria-label="${n}"></button>`).join('')+'</div><div class="side-dock-settings"></div>';
+document.querySelector('#sidebar-tabs').innerHTML=['folder','layers','search','bookmark'].map((name,i)=>`<div class="workspace-tab-header ${i===0?'is-active':''}" role="tab" tabindex="0" aria-label="${name}"><div class="workspace-tab-header-inner"><div class="workspace-tab-header-inner-icon" data-icon="${name}"></div></div></div>`).join('');
+const tabCount=Number(params.get('tabs')||1);
+document.querySelector('#tabs').innerHTML=Array.from({length:tabCount},(_,i)=>`<div tabindex="0" role="tab" data-type="markdown" data-path="${escapeHTML(i?'工作笔记 '+i:articles[6])}.md" aria-selected="${i===0}" class="workspace-tab-header ${i===0?'is-active':''}"><div class="workspace-tab-header-inner"><span class="workspace-tab-header-inner-icon" data-icon="file-text"></span><div class="workspace-tab-header-inner-title">${i?'工作笔记 '+i:'How Warp builds se…'}</div><div class="workspace-tab-header-inner-close-button clickable-icon" data-icon="x" aria-label="关闭标签"></div></div></div>`).join('');
+document.querySelectorAll('[data-icon]').forEach(el=>{const icon=nativeIcon(el.dataset.icon);if(icon)el.append(icon);});
+document.querySelector('.calendar-grid').innerHTML=['周一','周二','周三','周四','周五','周六','周日'].map(d=>`<span class="weekday">${d}</span>`).join('')+Array.from({length:30},(_,i)=>`<span>${i+1}</span>`).join('');
+/* ENHANCER */
+const enhancer=window.mountEnhancer();
+const originalProfile=document.querySelector('.workspace-sidedock-vault-profile');
+window.nativeProfile=originalProfile;
+window.nativeProfileHTML=originalProfile.outerHTML;
+window.nativeActions=[];
+for(const [selector,action] of [['.workspace-drawer-vault-switcher','vault'],['[data-icon="settings"]','settings'],['[data-icon="circle-help"]','help']])originalProfile.querySelector(selector).addEventListener('click',event=>window.nativeActions.push({action,x:event.clientX,y:event.clientY}));
+window.shellControls=window.mountShellControls();
+document.querySelector('.status-bar-item:last-child').classList.add('syncstatusbar');
+document.fonts.ready.then(()=>setTimeout(()=>{
+  const result={};const style=el=>getComputedStyle(el),rect=el=>el.getBoundingClientRect();
+  const check=(condition,message)=>{if(!condition)throw Error(message);};
+  try {
+    const selected=document.querySelector('.nav-file-title.is-active'),label=selected.querySelector('.nav-file-title-content');
+    result.rowHeight=rect(selected).height;if(leftVisible)check(result.rowHeight===34,'row height');
+    result.font=style(label).fontFamily;check(!result.font.includes('JetBrains'),'UI font');
+    check(style(document.querySelector('#article')).fontFamily.includes('JetBrains'),'editor font changed');
+    const glyph=selected.querySelector('svg');result.glyph={width:rect(glyph).width,fill:style(glyph).fill,stroke:style(glyph).strokeWidth};
+    check((!leftVisible||result.glyph.width===16)&&result.glyph.fill!=='none'&&style(glyph).stroke==='none'&&glyph.dataset.nclIcon==='keyline-file-text','original filled document glyph');
+    const closed=document.querySelector('.nav-folder.is-collapsed svg');
+    check(closed.closest('.collapse-icon').classList.contains('is-collapsed'),'fixture must include native collapsed indicator state');
+    check(closed.dataset.nclIcon==='keyline-folder'&&style(closed).transform==='none'&&style(closed).fill!=='none','original horizontal filled folder');
+    const opened=document.querySelector('.nav-folder:not(.is-collapsed):not(.mod-root) > .nav-folder-title .ncl-file-identity-glyph');
+    check(opened.dataset.nclIcon==='keyline-folder-open'&&style(opened).strokeWidth==='2px'&&style(opened).strokeLinecap==='butt','original open-folder stroke');
+    const tab=document.querySelector('#tabs .workspace-tab-header');result.tab={width:rect(tab).width,height:rect(tab).height,radius:style(tab).borderRadius};
+    check(result.tab.height===32&&result.tab.width<=210,'tab size');
+    const button=document.querySelector('.workspace-tab-header-new-tab'),center=document.querySelector('#center');
+    check(rect(button).right<=rect(center).right+1,'new tab clipped');
+    const scroll=document.querySelector('#tabs');result.scroll={client:scroll.clientWidth,total:scroll.scrollWidth};result.tabOverflow=scroll.scrollWidth>scroll.clientWidth;
+    const header=scroll.parentElement,spacer=header.querySelector('.workspace-tab-header-spacer'),tabList=header.querySelector('.workspace-tab-header-tab-list');
+    const near=(actual,expected,message)=>check(Math.abs(actual-expected)<0.1,`${message}: ${actual} != ${expected}`);
+    const checkTabGroup=()=>{
+      const last=scroll.lastElementChild;
+      near(rect(scroll.firstElementChild).left,rect(header).left+parseFloat(style(header).paddingLeft),'whole group left alignment');
+      if(scroll.scrollWidth<=scroll.clientWidth)near(rect(button).left-rect(last).right,8,'plus follows last tab');
+      else near(rect(button).left-rect(scroll).right,8,'plus follows overflowing scroller');
+      near(rect(tabList).right,rect(header).right-parseFloat(style(header).paddingRight),'tab-list remains trailing');
+      check(rect(button).right<=rect(tabList).left,'new-tab overlaps tab list');
+    };
+    checkTabGroup();
+    result.leftInset=rect(tab).left-rect(header).left;
+    result.plusGap=rect(button).left-(result.tabOverflow?rect(scroll).right:rect(scroll.lastElementChild).right);
+    result.trailingSpace=rect(spacer).width;
+    if(frame==='no-sidebars')check(result.leftInset>=80,'traffic lights overlap');
+    if(tabCount>=12){check(result.tabOverflow,'many tabs should scroll');scroll.scrollLeft=scroll.scrollWidth;check(scroll.scrollLeft>0,'tab strip cannot scroll');scroll.scrollLeft=0;}
+    else {check(!result.tabOverflow,'small tab group should fit');check(result.trailingSpace>=(tabCount===1?20:8),'remaining space should be after plus');}
+    const titleContainer=document.querySelector('.view-header-title-container'),crumb=document.querySelector('.view-header-title-parent');
+    check(style(titleContainer).justifyContent==='flex-start','breadcrumb must be leading aligned');near(rect(crumb).left,rect(titleContainer).left,'breadcrumb left inset');
+    // Exercise native DOM tab additions/removals, without inventing a second
+    // app tab manager. Real core commands/dragging still require app QA.
+    const added=tab.cloneNode(true);scroll.append(added);checkTabGroup();added.remove();checkTabGroup();
+    if(tabCount===1){tab.style.width='150px';near(rect(tab).width,150,'native close-hover width lock');checkTabGroup();tab.style.width='';checkTabGroup();}
+    check(document.documentElement.scrollWidth<=innerWidth,'viewport overflow');
+    check(rect(document.querySelector('#shell')).bottom<=innerHeight,'window frame overflow');
+    check(rect(document.querySelector('#frame')).right<=innerWidth-17,'frame exceeds the viewport');
+    check(rect(label).right<=rect(selected).right,'label overflow');
+    const documentCard=document.querySelector('#center > .workspace-tabs > .workspace-tab-container');
+    const status=document.querySelector('.status-bar');
+    result.documentCard={radius:style(documentCard).borderRadius,left:rect(documentCard).left-rect(center).left,right:rect(center).right-rect(documentCard).right,bottom:rect(center).bottom-rect(documentCard).bottom,clipped:style(documentCard).overflow};
+    check(result.documentCard.radius==='12px'&&result.documentCard.clipped==='hidden','four rounded document corners');
+    near(result.documentCard.left,leftVisible?0:8,'single document leading gutter owner');near(result.documentCard.right,8,'document right gutter');near(result.documentCard.bottom,8,'document bottom gutter');
+    check(rect(documentCard).top>=rect(header).bottom,'Tab strip entered document card');
+    check(rect(status).top>=rect(documentCard).bottom+4,'status bar clips bottom corner');
+    check(style(status).position==='static','status bar floats across document edge');
+    const statusItems=[...status.querySelectorAll('.status-bar-item')];
+    const statusIcons=[...status.querySelectorAll('svg')];
+    const windowBottom=rect(document.querySelector('#frame')).bottom-1;
+    const sr=rect(statusItems[0]);
+    result.status={font:style(status).fontSize,height:rect(status).height,itemHeight:sr.height,
+      top:sr.top-rect(documentCard).bottom,bottom:windowBottom-sr.bottom,
+      icons:statusIcons.map(el=>({width:rect(el).width,height:rect(el).height}))};
+    near(parseFloat(result.status.font),11,'status font');near(sr.height,20,'status action target height');
+    near(result.status.top,4,'status row top clearance');near(result.status.bottom,4,'status row bottom clearance');
+    for(const el of statusItems)near(rect(el).top+rect(el).height/2,sr.top+sr.height/2,'status items aligned');
+    for(const el of statusIcons){near(rect(el).width,12,'status glyph width');near(rect(el).height,12,'status glyph height');near(rect(el).top+rect(el).height/2,sr.top+sr.height/2,'status glyph centered');}
+    check(style(status.querySelector('.plugin-sync')).color===style(statusIcons[1]).stroke,'sync status color preserved');
+    const channels=color=>color.match(/[\d.]+/g).map(Number);
+    const luminance=color=>color.map(v=>v/255).map(v=>v<=0.04045?v/12.92:((v+0.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[0.2126,0.7152,0.0722][i],0);
+    const ink=channels(style(status).color),paper=channels(style(status).backgroundColor).slice(0,3),alpha=ink[3]??1;
+    const fg=luminance(ink.slice(0,3).map((v,i)=>v*alpha+paper[i]*(1-alpha))),bg=luminance(paper);
+    result.status.contrast=(Math.max(fg,bg)+0.05)/(Math.min(fg,bg)+0.05);
+    check(result.status.contrast>=4.5,'small status text has insufficient contrast');
+    statusIcons[1].classList.remove('svg-icon');near(rect(statusIcons[1]).width,12,'third-party SVG without native class');statusIcons[1].classList.add('svg-icon');
+    for(const el of status.querySelectorAll('.mod-clickable')){
+      const r=rect(el);check(r.width>=20&&r.height>=20,'small status hit target');
+      check(el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),'status action obscured');
+    }
+    // Third-party text can grow. Wrap in native flow; do not clip a warning,
+    // cover the editor, or reserve an empty footer when the bar is hidden.
+    const last=statusItems.at(-1),oldText=last.textContent;
+    last.textContent='Sync: WaitingForRemoteConnectionAndPendingChanges';
+    status.style.maxWidth='220px';status.style.alignSelf='flex-end';
+    result.status.wrapHeight=rect(status).height;
+    check(result.status.wrapHeight>result.status.height,'narrow status must wrap');
+    for(const el of statusItems){check(rect(el).right<=rect(status).right&&rect(el).left>=rect(status).left,'status item overflows narrow footer');}
+    check(rect(status).top>=rect(documentCard).bottom+4,'wrapped status covers card');
+    status.style.maxWidth='';status.style.alignSelf='';last.textContent=oldText;
+    const visibleBottom=rect(documentCard).bottom;status.style.display='none';
+    check(rect(documentCard).bottom>visibleBottom,'hidden status leaves a blank reserve');status.style.display='';
+    const statusChildren=[...status.childNodes];status.replaceChildren();
+    check(style(status).display==='none'&&rect(documentCard).bottom>visibleBottom,'empty status leaves a blank reserve');status.replaceChildren(...statusChildren);
+    const ti=tab.querySelector('.workspace-tab-header-inner-icon');
+    check(style(ti).display!=='none'&&rect(ti).width>=16,'Markdown Tab icon hidden');
+    check(ti.querySelectorAll('.ncl-file-identity-glyph').length===1,'missing or duplicate Tab identity');
+    check(style(ti).color===style(selected.querySelector('.ncl-native-file-icon')).color,'Sidebar/Tab identity color mismatch');
+    const dock=document.querySelector('#left'),card=getComputedStyle(dock,'::before');
+    result.sidebar=leftVisible?card.backgroundColor:style(document.body).getPropertyValue('--ncl-sidebar').trim();
+    result.canvas=style(document.querySelector('.markdown-reading-view')).backgroundColor;
+    result.right=style(document.querySelector('#right')).backgroundColor;
+    const dark=params.get('theme')==='dark';
+    check((!leftVisible||result.sidebar===(dark?'rgb(25, 25, 25)':'rgb(242, 242, 242)'))&&result.canvas===(dark?'rgb(30, 30, 30)':'rgb(255, 255, 255)')&&result.right===(dark?'rgb(41, 41, 41)':'rgb(242, 242, 242)'),'neutral palette');
+    if(leftVisible){
+      result.card={top:parseFloat(card.top),bottom:parseFloat(card.bottom),left:rect(dock).left+parseFloat(card.left)-rect(document.querySelector('#shell')).left,right:parseFloat(card.right),radius:card.borderRadius,shadow:card.boxShadow,pointer:card.pointerEvents};
+      near(result.card.top,8,'card top inset');near(result.card.bottom,8,'card bottom inset');near(result.card.left,8,'card left inset includes ribbon');near(result.card.right,8,'card-to-canvas gap');
+      result.panelGap=rect(documentCard).left-(rect(dock).right-parseFloat(card.right));
+      near(result.panelGap,8,'painted Sidebar/document gap equals outer gutter');
+      check(result.card.radius==='12px'&&result.card.shadow!=='none'&&result.card.pointer==='none','one non-interactive card surface');
+      const shadows=result.card.shadow.split(/, (?![^()]*\))/);
+      check(shadows.length===3&&shadows[0].endsWith('0px 0px 1px 0px')&&shadows[1].endsWith('0px 0px 1px 1px inset')&&shadows[2].endsWith('0px 4px 24px 0px'),'soft edge, inner highlight and diffuse shadow');
+      check(Number(style(dock).zIndex)===Number(style(dock).getPropertyValue('--layer-sidedock'))-1,'shadow must paint over the canvas but below the ribbon');
+      for(const selector of ['#ribbon .clickable-icon','#left .sidebar-toggle-button button','.view-header-nav-buttons button']){
+        const button=document.querySelector(selector),r=rect(button);
+        if(r.width&&r.height)check(button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)),'card covers a native control');
+      }
+      near(rect(dock).bottom,rect(document.querySelector('#shell')).bottom,'card must not stretch viewport');
+      const footer=document.querySelector('.workspace-sidedock-vault-profile');check(rect(footer).bottom<=rect(dock).bottom-8,'footer outside card');
+      check(rect(footer).left===rect(document.querySelector('#shell')).left+8,'footer does not span full navigation card');
+      const handle=dock.querySelector('.workspace-leaf-resize-handle'),hr=rect(handle);check(hr.width>=5,'resize handle lost');check(document.elementFromPoint(hr.x+hr.width/2,hr.y+hr.height/2)===handle,'card intercepts resize hit target');
+      const files=document.querySelector('.nav-files-container');if(files.scrollHeight>files.clientHeight){files.scrollTop=files.scrollHeight;check(files.scrollTop>0,'sidebar cannot scroll');files.scrollTop=0;}
+    }else check(card.content==='none','collapsed dock leaves a ghost card');
+    const ribbon=document.querySelector('#ribbon'), rb=rect(ribbon), action=ribbon.querySelector('.clickable-icon');
+    if(rb.width){
+      const ab=rect(action), inset=leftVisible?8:0;
+      // When collapsed, the visible corridor includes the editor's leading
+      // gutter. Measuring only rb.right previously concealed a 4px offset.
+      const corridorRight=leftVisible?rb.right:rect(documentCard).left;
+      result.ribbonBalance={left:ab.left-rb.left-inset,right:corridorRight-ab.right,width:rb.width};
+      near(result.ribbonBalance.left,result.ribbonBalance.right,'ribbon centered within visible corridor');
+      for(const button of ribbon.querySelectorAll('.clickable-icon')){
+        const br=rect(button),glyph=rect(button.querySelector('svg'));
+        near(br.left-rb.left-inset,corridorRight-br.right,'all ribbon controls centered');
+        near(glyph.left+glyph.width/2,br.left+br.width/2,'ribbon glyph centered in its target');
+        check(br.left>=rb.left&&br.right<=rb.right,'ribbon target clipped');
+        check(button.contains(document.elementFromPoint(br.x+br.width/2,br.y+br.height/2)),'ribbon target covered');
+        button.focus();check(document.activeElement===button,'ribbon keyboard focus lost');button.blur();
+      }
+      if(!leftVisible){
+        result.collapsedRibbon={background:style(ribbon).backgroundColor,top:getComputedStyle(ribbon,'::before').backgroundColor,border:style(ribbon).borderRightWidth};
+        check(result.collapsedRibbon.background===style(status).backgroundColor,'collapsed ribbon creates a separate canvas strip');
+        check(result.collapsedRibbon.top===style(status).backgroundColor,'collapsed ribbon header is a different color');
+        check(result.collapsedRibbon.border==='0px','collapsed ribbon retains hard separator');
+      }
+    }
+    const count=document.querySelectorAll('.ncl-native-file-icon').length;check(count===articles.length,'runtime enhancer icon coverage');
+    enhancer.stop();check(document.querySelectorAll('.ncl-native-file-icon').length===0,'unload cleanup');enhancer.start();
+    document.body.dataset.result='pass';
+  }catch(error){result.error=error.message;document.body.dataset.result='fail';}
+  document.querySelector('#result').textContent=JSON.stringify(result);
+},100));
+</script></body></html>

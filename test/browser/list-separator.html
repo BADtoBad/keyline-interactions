@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Keyline native list-separator geometry</title>
+  <link rel="stylesheet" href="../../../theme/Keyline/theme.css">
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    body {
+      --ncl-list-marker-gap: 10px;
+      --ncl-paragraph-before: 16px;
+      --ncl-paragraph-after: 16px;
+      --ncl-paragraph-gap: 0px;
+      --ncl-heading-before: 28.8px;
+      --ncl-heading-after: 9.6px;
+      --ncl-quote-line-gap: 10px;
+      margin: 0;
+      background: #222326;
+      color: #ececef;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    }
+
+    .fixture {
+      width: 420px;
+      margin: 24px;
+    }
+
+    .cm-editor,
+    .cm-content {
+      font: 16px/1.8 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    }
+
+    .cm-content,
+    .cm-line {
+      padding: 0;
+    }
+
+    .cm-formatting-list-ul,
+    .cm-formatting-list-ol {
+      padding-inline-start: 0.72em;
+      white-space: pre;
+    }
+
+    .list-bullet {
+      color: transparent;
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .list-bullet::before {
+      content: "\200B";
+    }
+
+    .list-bullet::after {
+      position: absolute;
+      content: "\200B";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #b3b4b9;
+    }
+
+    .task-list-label {
+      padding: 0;
+      margin-inline-start: -0.25em;
+    }
+
+    .task-list-label .task-list-item-checkbox {
+      appearance: none;
+      box-sizing: border-box;
+      width: 17px;
+      height: 17px;
+      position: relative;
+      top: -0.1em;
+      vertical-align: middle;
+      margin: 0 0.25em 0 0;
+      border: 1.5px solid #929298;
+      border-radius: 4px;
+    }
+
+    #result {
+      margin: 24px;
+      color: #b3b4b9;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body class="theme-dark" data-result="pending">
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="empty-list"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="filled-list"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="task-list"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="list-quote-transition"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="plain-enter-transition"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="quote-exit-transition"></div></div>
+  <div class="fixture markdown-source-view mod-cm6 is-live-preview"><div id="multiline-quote"></div></div>
+  <pre id="result">pending</pre>
+  <script src="../.build/listSeparatorFixture.js"></script>
+</body>
+</html>
