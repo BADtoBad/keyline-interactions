@@ -4,6 +4,10 @@ The optional editing and navigation companion for the [Keyline theme](https://gi
 
 [中文](README.zh-CN.md) · [Downloads](https://github.com/BADtoBad/keyline-interactions/releases)
 
+**Recommended with the Keyline theme for the editing experience shown below.** In Obsidian’s plugin list, this companion is named **Keyline**; it is not the theme itself. [Bucket Sidebar](https://github.com/BADtoBad/obsidian-bucket-sidebar) is a separate, optional plugin for curated groups. The theme works without either plugin, and this plugin does not require Bucket.
+
+This is a **GitHub preview**, installed manually as described below; it is not yet available in the Community catalogue.
+
 ## Features
 
 - Block drag handles, contextual insertion, and selected-text formatting.
@@ -12,6 +16,28 @@ The optional editing and navigation companion for the [Keyline theme](https://gi
 - A quiet, centred workspace switcher using Obsidian’s Workspaces core plugin.
 - Searchable settings for Interface, Typography, Icons, Editing, Insert and Advanced.
 - English and Chinese interface text, following Obsidian’s language. Restart after a language change. Stored paths, names, and note contents are unchanged.
+
+## Screenshots
+
+Native Obsidian screenshots from the fictional, all-English [Keyline Studio example Vault](https://github.com/BADtoBad/obsidian-keyline#try-the-example-vault), shown with the optional Keyline theme. The **right-hand grouped sidebar is Bucket Sidebar**, not part of this plugin.
+
+### Light — editing and file-type icons
+
+Select text to reveal the formatting toolbar. The native File Explorer on the left distinguishes notes, audio, Canvas, EPUB, PDF and image files with different icons. Icons identify files; they do not add readers for unsupported formats.
+
+![Light mode: selected-text formatting toolbar and file-type icons in the native File Explorer](assets/keyline-showcase-editing.png)
+
+### Dark — workspace switching
+
+The centred status-bar control opens an in-window menu for saved layouts. It uses Obsidian’s **Workspaces** core plugin.
+
+![Dark mode: the workspace menu opens above the centred status-bar switcher](assets/keyline-showcase-workspace.png)
+
+### Organised, bilingual settings
+
+Search across Interface, Typography, Icons, Editing, Insert and Advanced. The screenshot shows the English interface captured in 0.7.3; 0.7.4 retains this layout. Chinese uses the same controls and follows Obsidian’s language after a restart.
+
+![English Keyline settings with aligned category navigation and a settings search field](assets/settings-en.png)
 
 ## Install / upgrade
 
